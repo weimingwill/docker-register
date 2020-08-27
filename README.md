@@ -1,3 +1,5 @@
+# Docker Register
+
 docker-register sets up a container running [docker-gen][1].  docker-gen dynamically generate a
 python script when containers are started and stopped.  This generated script registers the running
 containers host IP and port in etcd with a TTL.  It works in tandem with docker-discover which
@@ -7,6 +9,19 @@ Together, they implement [service discovery][2] for docker containers with a sim
 to [SmartStack][3]. docker-register is analagous to [nerve][4] in the SmartStack system.
 
 See also [Docker Service Discovery Using Etcd and Haproxy][5]
+
+
+### Upgrade
+
+The original [docker-register](https://github.com/jwilder/docker-register) only supports etcd v2.
+
+It has been modified to support etcd v3. 
+
+You can build the docker image with following command and follow the same usage.
+```
+docker build -t docker-register -f Dockerfile .
+```
+
 
 ### Usage
 

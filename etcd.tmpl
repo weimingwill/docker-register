@@ -1,41 +1,41 @@
 
 #!/usr/bin/python
 
-import etcd
+import etcd3
 import sys
-from urlparse import urlparse
 
 etcd_host = "{{ .Env.ETCD_HOST }}"
 if not etcd_host:
-    print "ETCD_HOST not set"
+    print("ETCD_HOST not set")
     sys.exit(1)
 
-port = 4001
+port = 2379
 host = etcd_host
 
 if ":" in etcd_host:
     host, port = etcd_host.split(":")
 
-client = etcd.Client(host=host, port=int(port))
+print("{}:{}".format(host, port))
 
-try:
-    backends = client.read("/backends")
-except (etcd.EtcdKeyNotFound, KeyError):
-    client.write("/backends", None, dir=True)
+client = etcd3.client(host=host, port=int(port))
 
 {{ $local := . }}
-{{range $key, $value := .}}
-{{ $addrLen := len $value.Addresses }}
-{{ if eq $addrLen 1 }}
-{{ with $address := index $value.Addresses 0 }}
+{{ range $key, $value := . }}
 
-{{ if $address.HostPort}}
-# {{ $value.Name }}
+    {{ $addrLen := len $value.Addresses }}
 
-client.write("/backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}", ttl=15)
-client.write("/backends/{{ $value.Image.Repository}}/port", "{{ $address.Port }}", ttl=15)
+    {{ if gt $addrLen 0 }}
 
-{{ end }}
-{{ end }}
-{{end}}
+        {{ with $address := index $value.Addresses 0 }}
+            {{ if $address.HostPort}}
+
+client.put("/backends/{{ $value.Image.Repository }}/{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}", "{{ $value.Name }}")
+# Some other data format to put to etcd
+# client.put("/backends/{{ $value.Image.Repository }}/{{ $value.Name }}", "{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}")
+# client.put("/backends/{{ $value.Image.Repository }}/{{printf "%.*s" 12 $value.ID}}", "{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}")
+# client.put("/backends/{{ $value.Image.Repository }}/port", 
+
+            {{end}}
+        {{end}}
+    {{end}}
 {{end}}
