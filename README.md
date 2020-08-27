@@ -11,7 +11,7 @@ to [SmartStack][3]. docker-register is analagous to [nerve][4] in the SmartStack
 See also [Docker Service Discovery Using Etcd and Haproxy][5]
 
 
-### Upgrade
+### Etcd V3
 
 The original [docker-register](https://github.com/jwilder/docker-register) only supports etcd v2.
 
